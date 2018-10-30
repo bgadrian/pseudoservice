@@ -1,0 +1,161 @@
+---
+swagger: "2.0"
+info:
+  description: "Deterministic or pseudo-random data generator"
+  version: "1.0.0"
+  title: "Pseudo Service"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    name: "Swagger API Team"
+  license:
+    name: "AGPL 2.0"
+host: "localhost"
+basePath: "/api/v1/"
+schemes:
+- "http"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+paths:
+  /users/{count}:
+    get:
+      description: "Get a random user"
+      parameters:
+      - name: "count"
+        in: "path"
+        description: "How many users to return"
+        required: true
+        type: "integer"
+        format: "int32"
+        maximum: 500
+        minimum: 1
+        x-exportParamName: "Count"
+      - name: "seed"
+        format: "int64"
+        in: "query"
+        description: "Seed that will be used to generate the users (deterministc call)"
+        required: false
+        type: "integer"
+        x-exportParamName: "Seed"
+      responses:
+        200:
+          description: "The users were succesfully generated"
+          schema:
+            $ref: "#/definitions/ResponseModel"
+        default:
+          description: "Error occured"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+      security:
+      - apikey: []
+securityDefinitions:
+  apikey:
+    type: "apiKey"
+    name: "token"
+    in: "query"
+definitions:
+  User:
+    type: "object"
+    required:
+    - "id"
+    - "name"
+    properties:
+      id:
+        type: "string"
+        example: "356b1896-ee58-4fd8-931d-4cfaee21158e"
+        description: "UUID for this user"
+      name:
+        type: "string"
+        example: "John Doe"
+        description: "First and Last name"
+        minLength: 2
+        maxLength: 200
+      gender:
+        type: "string"
+        description: "Gender one of [M, F, ?] "
+        enum:
+        - "M"
+        - "F"
+        - "?"
+      email:
+        type: "string"
+        example: "john@mambo.dot"
+      country:
+        type: "string"
+        example: "Romania"
+      timezone:
+        type: "string"
+        example: "Africa/Banjul"
+      friends:
+        type: "array"
+        example:
+        - "356b1896-ee58-4fd8-931d-4cfaee21158e"
+        - "356b1896-ee58-4fd8-931d-4cfaee21158e"
+        description: "Random list of UUIDs from the same response. To increase the\
+          \ chance of having friends request for bigger batches."
+        items:
+          type: "string"
+          example: "356b1896-ee58-4fd8-931d-4cfaee21158e"
+          description: "UUID for this user"
+    example:
+      country: "Romania"
+      gender: "M"
+      timezone: "Africa/Banjul"
+      name: "John Doe"
+      id: "356b1896-ee58-4fd8-931d-4cfaee21158e"
+      email: "john@mambo.dot"
+      friends:
+      - "356b1896-ee58-4fd8-931d-4cfaee21158e"
+      - "356b1896-ee58-4fd8-931d-4cfaee21158e"
+  ResponseModel:
+    type: "object"
+    properties:
+      seed:
+        type: "integer"
+        format: "int64"
+        description: "Number that was used to generate these users"
+      nextseed:
+        type: "integer"
+        format: "int64"
+        description: "Use this to get the next users from the deterministic series"
+      users:
+        type: "array"
+        items:
+          $ref: "#/definitions/User"
+    example:
+      nextseed: 6
+      seed: 0
+      users:
+      - country: "Romania"
+        gender: "M"
+        timezone: "Africa/Banjul"
+        name: "John Doe"
+        id: "356b1896-ee58-4fd8-931d-4cfaee21158e"
+        email: "john@mambo.dot"
+        friends:
+        - "356b1896-ee58-4fd8-931d-4cfaee21158e"
+        - "356b1896-ee58-4fd8-931d-4cfaee21158e"
+      - country: "Romania"
+        gender: "M"
+        timezone: "Africa/Banjul"
+        name: "John Doe"
+        id: "356b1896-ee58-4fd8-931d-4cfaee21158e"
+        email: "john@mambo.dot"
+        friends:
+        - "356b1896-ee58-4fd8-931d-4cfaee21158e"
+        - "356b1896-ee58-4fd8-931d-4cfaee21158e"
+  ErrorModel:
+    type: "object"
+    required:
+    - "code"
+    - "message"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      message:
+        type: "string"
+    example:
+      code: 42
+      message: "Something went wrong"
