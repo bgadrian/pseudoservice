@@ -20,6 +20,7 @@ type config struct {
 	ApiKey   string `env:"APIKEY" envDefault:"SECRET42"`
 	BasePath string `env:"BASEPATH" envDefault:"/api/v1"`
 	Port     int    `env:"PORT" envDefault:"8080"`
+	Debug    bool   `env:"DEBUG" envDefault:"false"`
 }
 
 func main() {
@@ -34,6 +35,7 @@ func main() {
 		fmt.Println("Accepting the following parameters:")
 		fmt.Println("ENV variable: PORT")
 		fmt.Println("ENV variable: APIKEY")
+		fmt.Println("ENV variable: DEBUG")
 		fmt.Println("HTTP query: ?token=MYAPIKEY")
 		fmt.Println("HTTP header: Accept-Encoding: gzip")
 		os.Exit(0)
@@ -43,7 +45,10 @@ func main() {
 	middlewares := []mux.MiddlewareFunc{}
 	apiKeeper := server.NewApiKeyHandler([]string{cfg.ApiKey})
 	middlewares = append(middlewares, apiKeeper.Handle)
-	middlewares = append(middlewares, server.Logger, server.Gzip, server.CustomHeaders)
+	middlewares = append(middlewares, server.Gzip, server.CustomHeaders)
+	if cfg.Debug {
+		middlewares = append(middlewares, server.Logger)
+	}
 
 	router := server.NewRouter(routes, middlewares)
 	srv := server.New(router, ":"+strconv.Itoa(cfg.Port))
