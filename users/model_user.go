@@ -9,27 +9,76 @@
 
 package users
 
+import (
+	"fmt"
+	"math"
+	"strings"
+	"sync"
+
+	"github.com/brianvoe/gofakeit"
+)
+
 type User struct {
 
 	// UUID for this user
-	Id string `json:"id"`
-
-	// First and Last name
-	Name string `json:"name"`
-
-	// Gender one of [M, F, ?]
-	Gender string `json:"gender,omitempty"`
-
-	Email string `json:"email,omitempty"`
-
-	Country string `json:"country,omitempty"`
-
-	Timezone string `json:"timezone,omitempty"`
-
+	Id       string `json:"id" fake:"skip"`
+	Age      uint8  `json:"age"  fake:"skip"`
+	Name     string `json:"name" fake:"{person.first} {person.last}"`
+	Company  string `json:"company,omitempty" fake:"{company.buzzwords} {company.bs} {company.suffix}"`
+	Position string `json:"position,omitempty" fake:"{job.descriptor} {job.level} {job.title}"`
+	Email    string `json:"email,omitempty" fake:"@{person.last}.{internet.domain_suffix}"`
+	Country  string `json:"country,omitempty" fake:"{country.country}"`
 	// Random list of UUIDs from the same response. To increase the chance of having friends request for bigger batches.
 	Friends []string `json:"friends,omitempty"`
 }
 
+//TODO make it safe https://github.com/brianvoe/gofakeit/issues/32
+var hackMutex sync.Mutex
+
+//GenerateUsers deterministic generation of (random) users.
 func GenerateUsers(seed int64, count int) ([]*User, int64, error) {
-	return nil, 0, nil
+	if math.MaxInt64-int64(count) <= seed {
+		//chance to being here is like ... 2^63-count ...is like winning the lottery
+		return nil, 0, fmt.Errorf("int overflow, need a smaller seed: %d count: %d", seed, count)
+	}
+
+	hackMutex.Lock()
+	defer hackMutex.Unlock()
+
+	result := []*User{}
+	friendsIndexs := []int{}
+	for i := 0; i < count; i++ {
+		//ALERT as long as the USER.Fields remain in the same order and type
+		//and the following lines remain in order, the calls will be deterministic/backward
+		//compatible.
+
+		user := &User{}
+		gofakeit.Seed(seed)
+		user.Id = gofakeit.UUID()
+		user.Age = gofakeit.Uint8()
+		gofakeit.Struct(&user)
+		user.Email = strings.Replace(user.Name, " ", "", -1) + user.Email
+
+		//FRIENDS from the same batch
+		user.Friends = make([]string, 0)
+		zeroTendency := len(result) / 3                              //at least 33% will have 0 friends
+		friendCount := gofakeit.Number(-zeroTendency, len(result)/2) //max of half of users so far
+		if friendCount < 0 {
+			friendCount = 0
+		}
+
+		if friendCount > 0 {
+			gofakeit.ShuffleInts(friendsIndexs)
+			for fcount := 0; fcount < friendCount; fcount++ {
+				friend := result[friendsIndexs[fcount]]
+				user.Friends = append(user.Friends, friend.Id)   //him -> me
+				friend.Friends = append(friend.Friends, user.Id) //me -> him
+			}
+		}
+
+		seed++
+		result = append(result, user)
+		friendsIndexs = append(friendsIndexs, i)
+	}
+	return result, seed, nil
 }

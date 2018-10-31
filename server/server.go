@@ -30,12 +30,13 @@ func New(mux http.Handler, serverAddress string) *http.Server {
 		},
 	}
 	srv := &http.Server{
-		Addr:         serverAddress,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  120 * time.Second,
-		TLSConfig:    tlsConfig,
-		Handler:      mux,
+		Addr:           serverAddress,
+		ReadTimeout:    1 * time.Second,
+		WriteTimeout:   1 * time.Second,
+		IdleTimeout:    2 * time.Second,
+		TLSConfig:      tlsConfig,
+		Handler:        mux,
+		MaxHeaderBytes: 3 << 10,
 	}
 	return srv
 }

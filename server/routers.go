@@ -59,10 +59,9 @@ const PARAM_SEED = "seed"
 
 func UsersCountGet(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello World!")
-	vars := mux.Vars(r)
 	var err error
 
-	userCountStr, exists := vars[PARAM_COUNT]
+	userCountStr, exists := mux.Vars(r)[PARAM_COUNT]
 	if exists == false {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write(NewErrorJson(ERROR_MISSING_COUNT, "parameter required: "+PARAM_COUNT))
@@ -77,16 +76,23 @@ func UsersCountGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var seed int64
-	seedStr, exists := vars[PARAM_SEED]
+	queryValues := r.URL.Query()
+	seedStr, exists := queryValues[PARAM_SEED]
+	exists = exists && len(seedStr) > 0
 	if exists {
-		seed, err = strconv.ParseInt(seedStr, 10, 64)
+		log.Printf("missing seed %v \n", queryValues)
+		seed, err = strconv.ParseInt(seedStr[0], 10, 64)
+
+		if err != nil {
+			exists = false
+			log.Printf("error parsing query seed %s", seedStr[0])
+		}
 	}
 
-	if exists == false || err != nil {
+	if exists == false {
 		seed = rand.Int63()
 	}
 
-	log.Printf("%s %s", userCount, seed)
 	userList, nextSeed, err := users.GenerateUsers(seed, userCount)
 
 	if err != nil {
@@ -102,7 +108,6 @@ func UsersCountGet(w http.ResponseWriter, r *http.Request) {
 		Seed:     seed,
 		Users:    userList,
 	}
-	w.WriteHeader(http.StatusOK)
 	resultAsJson, err := json.Marshal(result)
 	if err != nil {
 		log.Printf("error writing users: %s", err)

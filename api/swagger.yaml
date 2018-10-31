@@ -34,17 +34,17 @@ paths:
       - name: "seed"
         format: "int64"
         in: "query"
-        description: "Seed that will be used to generate the users (deterministc call)"
+        description: "Seed that will be used to generate the users (deterministic call). The seed will determine the first User data, seed+1 the next user, and so on. If no seed is provided a pseudo-random one will be generated (rand.Int63)."
         required: false
         type: "integer"
         x-exportParamName: "Seed"
       responses:
         200:
-          description: "The users were succesfully generated"
+          description: "The users were successfully generated"
           schema:
             $ref: "#/definitions/ResponseModel"
         default:
-          description: "Error occured"
+          description: "Error occurred"
           schema:
             $ref: "#/definitions/ErrorModel"
       security:
@@ -65,48 +65,46 @@ definitions:
         type: "string"
         example: "356b1896-ee58-4fd8-931d-4cfaee21158e"
         description: "UUID for this user"
+      age:
+        type: "number"
+        minimum: 0
+        maximum: 255
       name:
         type: "string"
         example: "John Doe"
         description: "First and Last name"
-        minLength: 2
-        maxLength: 200
-      gender:
+      Company:
         type: "string"
-        description: "Gender one of [M, F, ?] "
-        enum:
-        - "M"
-        - "F"
-        - "?"
+        example: "De-engineered niches Group"
+      position:
+        type: "string"
+        example: "Central Branding Producer"
       email:
         type: "string"
         example: "john@mambo.dot"
       country:
         type: "string"
         example: "Romania"
-      timezone:
-        type: "string"
-        example: "Africa/Banjul"
       friends:
         type: "array"
         example:
         - "356b1896-ee58-4fd8-931d-4cfaee21158e"
-        - "356b1896-ee58-4fd8-931d-4cfaee21158e"
-        description: "Random list of UUIDs from the same response. To increase the\
-          \ chance of having friends request for bigger batches."
+        - "3d813194-e9ed-4b09-a1ae-301b83bfdd9d"
+        description: "Random list of UUIDs from the same response. To increase the chance of having friends request for bigger batches."
         items:
           type: "string"
           example: "356b1896-ee58-4fd8-931d-4cfaee21158e"
-          description: "UUID for this user"
+          description: "UUID for this friend"
     example:
-      country: "Romania"
-      gender: "M"
-      timezone: "Africa/Banjul"
-      name: "John Doe"
       id: "356b1896-ee58-4fd8-931d-4cfaee21158e"
+      age: 33
+      name: "John Doe"
+      company: "De-engineered niches Group"
+      position: "Central Branding Producer"
       email: "john@mambo.dot"
+      country: "Romania"
       friends:
-      - "356b1896-ee58-4fd8-931d-4cfaee21158e"
+      - "3d813194-e9ed-4b09-a1ae-301b83bfdd9d"
       - "356b1896-ee58-4fd8-931d-4cfaee21158e"
   ResponseModel:
     type: "object"
@@ -127,23 +125,15 @@ definitions:
       nextseed: 6
       seed: 0
       users:
-      - country: "Romania"
-        gender: "M"
-        timezone: "Africa/Banjul"
+      - id: "356b1896-ee58-4fd8-931d-4cfaee21158e"
+        age: 33
         name: "John Doe"
-        id: "356b1896-ee58-4fd8-931d-4cfaee21158e"
+        company: "De-engineered niches Group"
+        position: "Central Branding Producer"
         email: "john@mambo.dot"
+        country: "Romania"
         friends:
-        - "356b1896-ee58-4fd8-931d-4cfaee21158e"
-        - "356b1896-ee58-4fd8-931d-4cfaee21158e"
-      - country: "Romania"
-        gender: "M"
-        timezone: "Africa/Banjul"
-        name: "John Doe"
-        id: "356b1896-ee58-4fd8-931d-4cfaee21158e"
-        email: "john@mambo.dot"
-        friends:
-        - "356b1896-ee58-4fd8-931d-4cfaee21158e"
+        - "3d813194-e9ed-4b09-a1ae-301b83bfdd9d"
         - "356b1896-ee58-4fd8-931d-4cfaee21158e"
   ErrorModel:
     type: "object"
