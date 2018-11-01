@@ -80,7 +80,7 @@ func UsersCountGet(w http.ResponseWriter, r *http.Request) {
 	seedStr, exists := queryValues[PARAM_SEED]
 	exists = exists && len(seedStr) > 0
 	if exists {
-		log.Printf("missing seed %v \n", queryValues)
+		//log.Printf("missing seed %v \n", queryValues)
 		seed, err = strconv.ParseInt(seedStr[0], 10, 64)
 
 		if err != nil {
@@ -93,7 +93,7 @@ func UsersCountGet(w http.ResponseWriter, r *http.Request) {
 		seed = rand.Int63()
 	}
 
-	userList, nextSeed, err := users.GenerateUsers(seed, userCount)
+	userList, nextSeed, err := users.GenerateUsers(seed, userCount, exists)
 
 	if err != nil {
 		log.Printf("error generate users: %s", err)

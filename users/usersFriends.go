@@ -35,7 +35,7 @@ type User struct {
 var hackMutex sync.Mutex
 
 //GenerateUsers deterministic generation of (random) users.
-func GenerateUsers(seed int64, count int) ([]*User, int64, error) {
+func GenerateUsers(seed int64, count int, deterministic bool) ([]*User, int64, error) {
 	if math.MaxInt64-int64(count) <= seed {
 		//chance to being here is like ... 2^63-count ...is like winning the lottery
 		return nil, 0, fmt.Errorf("int overflow, need a smaller seed: %d count: %d", seed, count)
@@ -43,6 +43,10 @@ func GenerateUsers(seed int64, count int) ([]*User, int64, error) {
 
 	hackMutex.Lock()
 	defer hackMutex.Unlock()
+
+	if deterministic == false {
+		gofakeit.Seed(seed)
+	}
 
 	result := []*User{}
 	friendsIndexs := []int{}
@@ -55,7 +59,11 @@ func GenerateUsers(seed int64, count int) ([]*User, int64, error) {
 		}
 
 		user := &User{}
-		gofakeit.Seed(seed)
+		if deterministic {
+			//each seed value must return a specific user, with same data
+			//but the performance is 30% worst
+			gofakeit.Seed(seed)
+		}
 		user.Id = gofakeit.UUID()
 		user.Age = gofakeit.Uint8()
 		user.Name = gofakeit.Name()
