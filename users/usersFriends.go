@@ -79,11 +79,11 @@ func GenerateUsers(seed int64, count int, deterministic bool) ([]*User, int64, e
 		user.Country = gofakeit.Country()
 
 		//FRIENDS from the same batch
-		user.Friends = make([]string, 0)
 		zeroTendency := len(result) / 3                              //at least 33% will have 0 friends
 		friendCount := gofakeit.Number(-zeroTendency, len(result)/2) //max of half of users so far
 
 		if friendCount > 0 {
+			user.Friends = make([]string, 0, friendCount)
 			fcount := 0
 			//shuffle them more rarely, for perf reasons
 			if i%10 == 0 {

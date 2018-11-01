@@ -9,8 +9,9 @@ run: pre
 	go run $(source)
 
 build: pre
-	go build -o ./build/server $(source)
-	@echo "See ./build/server --help"
+	rm -f ./build/pseudoservice
+	go build -o ./build/pseudoservice $(source)
+	@echo "See ./build/pseudoservice --help"
 
 buildall: pre
 	mkdir -p ./build/pseudoservice/windows

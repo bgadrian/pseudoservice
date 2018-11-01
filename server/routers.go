@@ -58,7 +58,6 @@ const PARAM_COUNT = "count"
 const PARAM_SEED = "seed"
 
 func UsersCountGet(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello World!")
 	var err error
 
 	userCountStr, exists := mux.Vars(r)[PARAM_COUNT]
@@ -80,16 +79,14 @@ func UsersCountGet(w http.ResponseWriter, r *http.Request) {
 	seedStr, exists := queryValues[PARAM_SEED]
 	exists = exists && len(seedStr) > 0
 	if exists {
-		//log.Printf("missing seed %v \n", queryValues)
 		seed, err = strconv.ParseInt(seedStr[0], 10, 64)
 
 		if err != nil {
-			exists = false
-			log.Printf("error parsing query seed %s", seedStr[0])
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(NewErrorJson(ERROR_WRONG_SEED, "seed must be a valid int64"))
+			return
 		}
-	}
-
-	if exists == false {
+	} else {
 		seed = rand.Int63()
 	}
 

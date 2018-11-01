@@ -33,11 +33,11 @@ func areValid(users []*User) bool {
 func TestGenerateUsersDeterministic(t *testing.T) {
 	seeds := []int64{-422, 0, 1, 100, 123456123456}
 	for _, seed := range seeds {
-		usersA, nextA, err := GenerateUsers(seed, 3)
+		usersA, nextA, err := GenerateUsers(seed, 3, true)
 		if err != nil {
 			t.Error(err)
 		}
-		usersB, nextB, err := GenerateUsers(seed, 3)
+		usersB, nextB, err := GenerateUsers(seed, 3, true)
 		if err != nil {
 			t.Error(err)
 		}
@@ -56,7 +56,7 @@ func TestGenerateUsersDeterministic(t *testing.T) {
 func TestGenerateUsersHasData(t *testing.T) {
 	sizes := []int{0, 1, 100, 1000}
 	for _, size := range sizes {
-		users, _, err := GenerateUsers(42, size)
+		users, _, err := GenerateUsers(42, size, false)
 
 		if err != nil {
 			t.Error(err)
