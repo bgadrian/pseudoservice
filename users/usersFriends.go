@@ -41,15 +41,18 @@ func GenerateUsers(seed int64, count int, deterministic bool) ([]*User, int64, e
 		return nil, 0, fmt.Errorf("int overflow, need a smaller seed: %d count: %d", seed, count)
 	}
 
-	hackMutex.Lock()
-	defer hackMutex.Unlock()
+	if deterministic {
+		hackMutex.Lock()
+		defer hackMutex.Unlock()
+	}
 
 	if deterministic == false {
 		gofakeit.Seed(seed)
 	}
 
-	result := []*User{}
-	friendsIndexs := []int{}
+	result := make([]*User, 0, count)
+	friendsIndexs := make([]int, 0, count)
+
 	for i := 0; i < count; i++ {
 		//ALERT as long as the following lines remain in order, the calls will be deterministic/backward
 		//compatible.
@@ -71,6 +74,7 @@ func GenerateUsers(seed int64, count int, deterministic bool) ([]*User, int64, e
 			gofakeit.BS() + " " + gofakeit.CompanySuffix()
 		user.Position = gofakeit.JobDescriptor() + " " +
 			gofakeit.JobLevel() + " " + gofakeit.JobTitle()
+
 		user.Email = strings.Replace(user.Name, " ", "", -1) + "." + gofakeit.DomainSuffix()
 		user.Country = gofakeit.Country()
 
@@ -80,8 +84,16 @@ func GenerateUsers(seed int64, count int, deterministic bool) ([]*User, int64, e
 		friendCount := gofakeit.Number(-zeroTendency, len(result)/2) //max of half of users so far
 
 		if friendCount > 0 {
-			gofakeit.ShuffleInts(friendsIndexs)
-			for fcount := 0; fcount < friendCount; fcount++ {
+			fcount := 0
+			//shuffle them more rarely, for perf reasons
+			if i%10 == 0 {
+				gofakeit.ShuffleInts(friendsIndexs)
+			} else {
+				//we do not shuffle it, but we start from a random friend
+				fcount = gofakeit.Number(0, len(friendsIndexs)-friendCount-1)
+			}
+
+			for ; fcount < friendCount; fcount++ {
 				friend := result[friendsIndexs[fcount]]
 				user.Friends = append(user.Friends, friend.Id)   //him -> me
 				friend.Friends = append(friend.Friends, user.Id) //me -> him

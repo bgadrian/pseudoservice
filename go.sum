@@ -1,5 +1,3 @@
-github.com/Pallinder/go-randomdata v0.0.0-20181030200306-422dd1e6304a h1:KKpVTlJXUForPBrazWmYQH5vii07PZZiCGj02u15gfo=
-github.com/Pallinder/go-randomdata v0.0.0-20181030200306-422dd1e6304a/go.mod h1:yHmJgulpD2Nfrm0cR9tI/+oAgRqCQQixsA8HyRZfV9Y=
 github.com/brianvoe/gofakeit v3.13.0+incompatible h1:OscAXOIT40Xp4qY/VBxyRVsvp1Jv7i0fyBnXdJmI9cI=
 github.com/brianvoe/gofakeit v3.13.0+incompatible/go.mod h1:kfwdRA90vvNhPutZWfH7WPaDzUjz+CZFqG+rPkOjGOc=
 github.com/caarlos0/env v3.5.0+incompatible h1:Yy0UN8o9Wtr/jGHZDpCBLpNrzcFLLM2yixi/rBrKyJs=

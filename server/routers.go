@@ -95,6 +95,10 @@ func UsersCountGet(w http.ResponseWriter, r *http.Request) {
 
 	userList, nextSeed, err := users.GenerateUsers(seed, userCount, exists)
 
+	if exists == false {
+		nextSeed = 0 //the response will be non-deterministic, so no use for it
+	}
+
 	if err != nil {
 		log.Printf("error generate users: %s", err)
 
