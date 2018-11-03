@@ -44,7 +44,7 @@ curl "http://localhost:8080/api/v1/users/1?token=SECRET42"
         "name":"Jonas Borer",
         "company":"core frictionless Inc",
         "position":"Senior Paradigm Associate",
-        "email":"JonasBorer.name",
+        "email":"JonasBorer@leadsolutions.org",
         "country":"Yemen"
     }
 ]}
@@ -59,8 +59,8 @@ curl "http://localhost:8080/api/v1/users/1?token=SECRET42&seed=42"
         "name":"Jacky Borer",
         "company":"Ameliorated mindshare Inc",
         "position":"International Assurance Orchestrator",
-        "email":"JackyBorer.info",
-        "country":"Uganda"
+        "email":"JackyBorer@leadsolutions.org",
+        "country":"Greece"
     }
 ]}
 ```

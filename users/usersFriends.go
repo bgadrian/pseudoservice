@@ -75,7 +75,8 @@ func GenerateUsers(seed int64, count int, deterministic bool) ([]*User, int64, e
 		user.Position = gofakeit.JobDescriptor() + " " +
 			gofakeit.JobLevel() + " " + gofakeit.JobTitle()
 
-		user.Email = strings.Replace(user.Name, " ", "", -1) + "." + gofakeit.DomainSuffix()
+		user.Email = strings.Replace(user.Name, " ", "", -1) +
+			"@" + gofakeit.DomainName()
 		user.Country = gofakeit.Country()
 
 		//FRIENDS from the same batch
