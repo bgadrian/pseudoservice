@@ -1,4 +1,4 @@
-#Pseudo service
+# Pseudo service
 
 Pseudo random (deterministic) data generator as a (micro) service.
 
@@ -70,6 +70,11 @@ curl "http://localhost:8080/api/v1/users/1?token=SECRET42&seed=42"
 a). Download the [binaries from a Release](https://github.com/bgadrian/pseudoservice/releases)
 
 OR b). Get the [docker image from bgadrian/pseudoservice/](https://hub.docker.com/r/bgadrian/pseudoservice/)
+```bash
+docker run --name pseudoservice -p 8080:8080 -d -e APIKEY=MYSECRET bgadrian/pseudoservice
+curl "http://localhost:8080/api/v1/users/1?token=MYSECRET&seed=42"
+
+```
 
 OR c). Hard way, requires Go 1.11, make and git
 ```bash
