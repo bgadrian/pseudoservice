@@ -23,6 +23,10 @@
 *.test
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
 *.sh
-api/
+Makefile
+*.yaml
+Dockerfile
 LICENSE
+build/

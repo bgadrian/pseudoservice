@@ -80,8 +80,10 @@ OR c). Hard way, requires Go 1.11, make and git
 ```bash
 git clone git@github.com:bgadrian/pseudoservice.git
 cd pseudoservice
+make run
+#OR
 make build
-./build/pseudoservice
+env PORT=8080 ./build/pseudoservice
 ```
 
 ### How to use
@@ -89,19 +91,19 @@ make build
 The binary has the following env variables:
 * `PORT` - http listening port (8080)
 * `APIKEY` - secret string to be served at `?token=SECRET42` 
-* `DEBUG` - outputs all incoming requests (low performance)
+* for more see `pseudoservice --help`
 
 All the endpoint have the following query params:
-* `token` - the APIKEY
+* `token` - required, the APIKEY
+* `seed` - optional, for deterministic responses
+
 
 The server accepts `gzip`.
 
-For public SSL I recommend a proxy like nginx or CloudFlare dynamic SSL option, the server does not support it yet.
-
+The server was generated using swagger (open API), to see a full documentation of the service access the [127.0.0.1:8080/docs](http://127.0.0.1:8080/docs) endpoint.
 
 ### TODO
 * make the docker multi-stage build work (lower the container from 700mb to 7mb)
-* contribute to brianvoe/gofakeit to (micro) optimize it further
 * add a general/custom endpoint, where the payload is an object with the types of data it requires to be generated (each client decide what objects to be generated)
 
 ### Copyright
