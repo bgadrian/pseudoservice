@@ -17,6 +17,7 @@ import (
 //TODO make it safe https://github.com/brianvoe/gofakeit/issues/32
 var hackMutex sync.Mutex
 
+// GetUsersHandler /users/{count} handler with real data
 func (h *MyHandlers) GetUsersHandler(params operations.GetUsersCountParams, principal interface{}) middleware.Responder {
 	var seed int64
 	exists := params.Seed == nil

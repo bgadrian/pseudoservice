@@ -28,9 +28,8 @@ func configureFlags(api *operations.PseudoServiceAPI) {
 	api.ApikeyAuth = func(token string) (interface{}, error) {
 		if token == values.Apikey {
 			return true, nil
-		} else {
-			return nil, errors.New("invalid token (apikey)")
 		}
+		return nil, errors.New("invalid token (apikey)")
 	}
 }
 

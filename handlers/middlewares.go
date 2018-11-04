@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+// CustomHeaders adds cache and basic HTTP headers to response
 func CustomHeaders(inner http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("X-Server", "pseudoservice")
@@ -37,6 +38,7 @@ func (w gzipResponseWriter) Write(b []byte) (int, error) {
 	return w.Writer.Write(b)
 }
 
+// Gzip add a simple gzip functionality if the clients accepts it
 func Gzip(inner http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 

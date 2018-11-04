@@ -1,4 +1,4 @@
-# Pseudo service
+# Pseudo service ![travis-mater](https://travis-ci.com/bgadrian/pseudoservice.svg?branch=master) [![Go Report Card](https://goreportcard.com/badge/github.com/bgadrian/pseudoservice)](https://goreportcard.com/report/github.com/bgadrian/pseudoservice)
 
 Pseudo random (deterministic) data generator as a (micro) service.
 

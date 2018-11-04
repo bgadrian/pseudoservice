@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// GetHealthHandler basic /health checks for math.rand entropy
 func (*MyHandlers) GetHealthHandler(params operations.GetHealthParams) middleware.Responder {
 	//gofakeit can remain out of entropy and block forever,
 	timeout := time.NewTicker(time.Millisecond * 200)
