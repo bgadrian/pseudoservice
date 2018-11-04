@@ -4,6 +4,7 @@ source := ./cmd/pseudo-service-server/main.go
 pre:
 	mkdir -p ./build/
 	env GO111MODULE=on go get -d ./
+	go test ./...
 
 run: pre
 	env PORT=8080 go run $(source)
