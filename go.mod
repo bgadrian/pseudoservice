@@ -14,8 +14,6 @@ require (
 	github.com/go-openapi/swag v0.17.2
 	github.com/go-openapi/validate v0.17.2
 	github.com/google/go-cmp v0.2.0
-	github.com/gorilla/context v1.1.1 // indirect
-	github.com/gorilla/mux v1.6.2
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/kr/pretty v0.1.0 // indirect
 	golang.org/x/net v0.0.0-20181102091132-c10e9556a7bc
