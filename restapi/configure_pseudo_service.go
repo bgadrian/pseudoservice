@@ -6,12 +6,12 @@ import (
 	"crypto/tls"
 	"errors"
 	"github.com/bgadrian/pseudoservice/handlers"
-	"github.com/go-openapi/swag"
-	"net/http"
-
 	"github.com/bgadrian/pseudoservice/restapi/operations"
 	swError "github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/swag"
+	"net/http"
+	//_ "net/http/pprof"
 )
 
 //go:generate swagger generate server --target .. --name PseudoService --spec ../swagger.yaml
@@ -60,6 +60,12 @@ func configureTLS(tlsConfig *tls.Config) {
 // This function can be called multiple times, depending on the number of serving schemes.
 // scheme value will be set accordingly: "http", "https" or "unix"
 func configureServer(s *http.Server, scheme, addr string) {
+	//
+	////for pprof
+	//go func() {
+	//	log.Print("pprof debug at http://localhost:6060")
+	//	http.ListenAndServe("0.0.0.0:6060", nil)
+	//}()
 }
 
 // The middleware configuration is for the handler executors. These do not apply to the swagger.json document.

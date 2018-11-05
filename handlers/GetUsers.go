@@ -18,16 +18,22 @@ import (
 var hackMutex sync.Mutex
 
 // GetUsersHandler /users/{count} handler with real data
-func (h *MyHandlers) GetUsersHandler(params operations.GetUsersCountParams, principal interface{}) middleware.Responder {
+func (h *MyHandlers) GetUsersHandler(params operations.GetUsersCountParams, principal interface{}) (result middleware.Responder) {
+	defer func() {
+		if err := recover(); err != nil {
+			errorResponse(h, fmt.Errorf("recovered in %v", err))
+		}
+	}()
+
 	var seed int64
-	exists := params.Seed == nil
-	if exists {
-		seed = gofakeit.Int64()
-	} else {
+	seedGiven := params.Seed != nil
+	if seedGiven {
 		seed = *params.Seed
+	} else {
+		seed = gofakeit.Int64()
 	}
 
-	users, nextseed, err := GenerateUsers(seed, int(params.Count), exists)
+	users, nextseed, err := GenerateUsers(seed, int(params.Count), seedGiven)
 	if err == nil {
 		response := &models.ResponseModel{}
 		response.Seed = seed
@@ -36,11 +42,17 @@ func (h *MyHandlers) GetUsersHandler(params operations.GetUsersCountParams, prin
 		return operations.NewGetUsersCountOK().WithPayload(response)
 	}
 
+	errorResponse := errorResponse(h, err)
+	return errorResponse
+}
+
+func errorResponse(h *MyHandlers, err error) *operations.GetUsersCountDefault {
 	h.Api.Logger("error generateusers '%s'", err)
 	code := int32(42)
 	message := "internal generator failed"
 	response := &models.ErrorModel{&code, &message}
-	return operations.NewGetUsersCountDefault(http.StatusInternalServerError).WithPayload(response)
+	errorResponse := operations.NewGetUsersCountDefault(http.StatusInternalServerError).WithPayload(response)
+	return errorResponse
 }
 
 //GenerateUsers deterministic generation of (random) users.
