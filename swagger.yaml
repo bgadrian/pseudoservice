@@ -12,10 +12,28 @@ host: "localhost"
 basePath: "/"
 schemes:
 - "http"
+#- "https"
 consumes:
 - "application/json"
 produces:
 - "application/json"
+parameters:
+  count:
+    name: "count"
+    in: "path"
+    description: "How many results to generate."
+    required: true
+    type: integer
+    format: "int32"
+    maximum: 500
+    minimum: 1
+  seed:
+    name: "seed"
+    format: "int64"
+    in: "query"
+    description: "The seed for the pseudo-random generator. For each unique value the same results will be given. If no seed is provided a pseudo-random one will be generated (rand.Int63)."
+    required: false
+    type: "integer"
 paths:
   /health:
     get:
@@ -25,42 +43,52 @@ paths:
           description: "Everything is fine"
         default:
           description: "Service is not available"
-  /users/{count}:
+  /custom/{count}:
     get:
-      description: "Get a random user"
+      description: "Generate results based on a pattern/template."
       parameters:
-      - name: "count"
-        in: "path"
-        description: "How many users to return"
+      - $ref: "#/parameters/count"
+      - $ref: "#/parameters/seed"
+      - in: query
+        name: "template"
+        type: "string"
+        description: "The template used to generate the results, eg: 'My name is ~name~'"
         required: true
-        type: "integer"
-        format: "int32"
-        maximum: 500
-        minimum: 1
-        x-exportParamName: "Count"
-      - name: "seed"
-        format: "int64"
-        in: "query"
-        description: "Seed that will be used to generate the users (deterministic call). The seed will determine the first User data, seed+1 the next user, and so on. If no seed is provided a pseudo-random one will be generated (rand.Int63)."
-        required: false
-        type: "integer"
-        x-exportParamName: "Seed"
+        minLength: 1
+        maxLength: 1024
       responses:
         200:
-          description: "The users were successfully generated"
+          description: "The results were successfully generated"
           schema:
-            $ref: "#/definitions/ResponseModel"
+            $ref: "#/definitions/CustomResponseModel"
         default:
           description: "Error occurred"
           schema:
             $ref: "#/definitions/ErrorModel"
       security:
       - apikey: []
+  /users/{count}:
+    get:
+      description: "Get a random user"
+      parameters:
+      - $ref: "#/parameters/count"
+      - $ref: "#/parameters/seed"
+      responses:
+        200:
+          description: "The users were successfully generated"
+          schema:
+            $ref: "#/definitions/UserResponseModel"
+        default:
+          description: "Error occurred"
+          schema:
+            $ref: "#/definitions/ErrorModel"
 securityDefinitions:
   apikey:
     type: "apiKey"
     name: "token"
     in: "query"
+security: #apply the apikey to all endpoints
+- apikey: []
 definitions:
   User:
     type: "object"
@@ -115,7 +143,7 @@ definitions:
       friends:
       - "3d813194-e9ed-4b09-a1ae-301b83bfdd9d"
       - "356b1896-ee58-4fd8-931d-4cfaee21158e"
-  ResponseModel:
+  UserResponseModel:
     type: "object"
     properties:
       seed:
@@ -158,3 +186,15 @@ definitions:
     example:
       code: 42
       message: "Something went wrong"
+  CustomResponseModel:
+    type: "object"
+    properties:
+      seed:
+        type: "integer"
+        format: "int64"
+        description: "Number that was used to generate these results"
+      results:
+        type: array
+        items:
+          type: string
+          description: "One result is one template with random data"

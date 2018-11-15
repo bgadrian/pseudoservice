@@ -14,9 +14,9 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// ResponseModel response model
-// swagger:model ResponseModel
-type ResponseModel struct {
+// UserResponseModel user response model
+// swagger:model UserResponseModel
+type UserResponseModel struct {
 
 	// Use this to get the next users from the deterministic series
 	Nextseed int64 `json:"nextseed,omitempty"`
@@ -28,8 +28,8 @@ type ResponseModel struct {
 	Users []*User `json:"users"`
 }
 
-// Validate validates this response model
-func (m *ResponseModel) Validate(formats strfmt.Registry) error {
+// Validate validates this user response model
+func (m *UserResponseModel) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateUsers(formats); err != nil {
@@ -42,7 +42,7 @@ func (m *ResponseModel) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ResponseModel) validateUsers(formats strfmt.Registry) error {
+func (m *UserResponseModel) validateUsers(formats strfmt.Registry) error {
 
 	if swag.IsZero(m.Users) { // not required
 		return nil
@@ -68,7 +68,7 @@ func (m *ResponseModel) validateUsers(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *ResponseModel) MarshalBinary() ([]byte, error) {
+func (m *UserResponseModel) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -76,8 +76,8 @@ func (m *ResponseModel) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *ResponseModel) UnmarshalBinary(b []byte) error {
-	var res ResponseModel
+func (m *UserResponseModel) UnmarshalBinary(b []byte) error {
+	var res UserResponseModel
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

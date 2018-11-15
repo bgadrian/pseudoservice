@@ -2,20 +2,17 @@ package handlers
 
 import (
 	"fmt"
+	"math"
+	"net/http"
+	"strings"
+
 	"github.com/bgadrian/pseudoservice/models"
 	"github.com/bgadrian/pseudoservice/restapi/operations"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
-	"math"
-	"net/http"
-	"strings"
-	"sync"
 
-	"github.com/brianvoe/gofakeit"
+	"github.com/bgadrian/fastfaker"
 )
-
-//TODO make it safe https://github.com/brianvoe/gofakeit/issues/32
-var hackMutex sync.Mutex
 
 // GetUsersHandler /users/{count} handler with real data
 func (h *MyHandlers) GetUsersHandler(params operations.GetUsersCountParams, principal interface{}) (result middleware.Responder) {
@@ -30,12 +27,12 @@ func (h *MyHandlers) GetUsersHandler(params operations.GetUsersCountParams, prin
 	if seedGiven {
 		seed = *params.Seed
 	} else {
-		seed = gofakeit.Int64()
+		seed = fastfaker.Global.Int64()
 	}
 
 	users, nextseed, err := GenerateUsers(seed, int(params.Count), seedGiven)
 	if err == nil {
-		response := &models.ResponseModel{}
+		response := &models.UserResponseModel{}
 		response.Seed = seed
 		response.Nextseed = nextseed
 		response.Users = users
@@ -61,14 +58,10 @@ func GenerateUsers(seed int64, count int, deterministic bool) ([]*models.User, i
 		//chance to being here is like ... 2^63-count ...is like winning the lottery
 		return nil, 0, fmt.Errorf("int overflow, need a smaller seed: %d count: %d", seed, count)
 	}
-
-	if deterministic {
-		hackMutex.Lock()
-		defer hackMutex.Unlock()
-	}
+	faker := fastfaker.NewFastFaker()
 
 	if deterministic == false {
-		gofakeit.Seed(seed)
+		faker.Seed(seed)
 	}
 
 	result := make([]*models.User, 0, count)
@@ -86,35 +79,35 @@ func GenerateUsers(seed int64, count int, deterministic bool) ([]*models.User, i
 		if deterministic {
 			//each seed value must return a specific user, with same data
 			//but the performance is 30% worst
-			gofakeit.Seed(seed)
+			faker.Seed(seed)
 		}
-		ID := strfmt.UUID(gofakeit.UUID())
+		ID := strfmt.UUID(faker.UUID())
 		user.ID = &ID
-		name := gofakeit.Name()
+		name := faker.Name()
 		user.Name = &name
-		//user.Age = gofakeit.Uint8()
-		user.Company = gofakeit.BuzzWord() + " " +
-			gofakeit.BS() + " " + gofakeit.CompanySuffix()
-		user.Position = gofakeit.JobDescriptor() + " " +
-			gofakeit.JobLevel() + " " + gofakeit.JobTitle()
+		//user.Age = faker.Uint8()
+		user.Company = faker.BuzzWord() + " " +
+			faker.BS() + " " + faker.CompanySuffix()
+		user.Position = faker.JobDescriptor() + " " +
+			faker.JobLevel() + " " + faker.JobTitle()
 
 		user.Email = strings.Replace(name, " ", "", -1) +
-			"@" + gofakeit.DomainName()
-		user.Country = gofakeit.Country()
+			"@" + faker.DomainName()
+		user.Country = faker.Country()
 
 		//FRIENDS from the same batch
-		zeroTendency := len(result) / 3                              //at least 33% will have 0 friends
-		friendCount := gofakeit.Number(-zeroTendency, len(result)/2) //max of half of users so far
+		zeroTendency := len(result) / 3                           //at least 33% will have 0 friends
+		friendCount := faker.Number(-zeroTendency, len(result)/2) //max of half of users so far
 
 		if friendCount > 0 {
 			user.Friends = make([]string, 0, friendCount)
 			fcount := 0
 			//shuffle them more rarely, for perf reasons
 			if i%10 == 0 {
-				gofakeit.ShuffleInts(friendsIndexs)
+				faker.ShuffleInts(friendsIndexs)
 			} else {
 				//we do not shuffle it, but we start from a random friend
-				fcount = gofakeit.Number(0, len(friendsIndexs)-friendCount-1)
+				fcount = faker.Number(0, len(friendsIndexs)-friendCount-1)
 			}
 
 			for ; fcount < friendCount; fcount++ {

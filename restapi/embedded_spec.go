@@ -42,6 +42,47 @@ func init() {
   "host": "localhost",
   "basePath": "/",
   "paths": {
+    "/custom/{count}": {
+      "get": {
+        "security": [
+          {
+            "apikey": []
+          }
+        ],
+        "description": "Generate results based on a pattern/template.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/count"
+          },
+          {
+            "$ref": "#/parameters/seed"
+          },
+          {
+            "maxLength": 1024,
+            "minLength": 1,
+            "type": "string",
+            "description": "The template used to generate the results, eg: 'My name is ~name~'",
+            "name": "template",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The results were successfully generated",
+            "schema": {
+              "$ref": "#/definitions/CustomResponseModel"
+            }
+          },
+          "default": {
+            "description": "Error occurred",
+            "schema": {
+              "$ref": "#/definitions/ErrorModel"
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "description": "Get the health of the service",
@@ -57,38 +98,20 @@ func init() {
     },
     "/users/{count}": {
       "get": {
-        "security": [
-          {
-            "apikey": []
-          }
-        ],
         "description": "Get a random user",
         "parameters": [
           {
-            "maximum": 500,
-            "minimum": 1,
-            "type": "integer",
-            "format": "int32",
-            "x-exportParamName": "Count",
-            "description": "How many users to return",
-            "name": "count",
-            "in": "path",
-            "required": true
+            "$ref": "#/parameters/count"
           },
           {
-            "type": "integer",
-            "format": "int64",
-            "x-exportParamName": "Seed",
-            "description": "Seed that will be used to generate the users (deterministic call). The seed will determine the first User data, seed+1 the next user, and so on. If no seed is provided a pseudo-random one will be generated (rand.Int63).",
-            "name": "seed",
-            "in": "query"
+            "$ref": "#/parameters/seed"
           }
         ],
         "responses": {
           "200": {
             "description": "The users were successfully generated",
             "schema": {
-              "$ref": "#/definitions/ResponseModel"
+              "$ref": "#/definitions/UserResponseModel"
             }
           },
           "default": {
@@ -102,6 +125,23 @@ func init() {
     }
   },
   "definitions": {
+    "CustomResponseModel": {
+      "type": "object",
+      "properties": {
+        "results": {
+          "type": "array",
+          "items": {
+            "description": "One result is one template with random data",
+            "type": "string"
+          }
+        },
+        "seed": {
+          "description": "Number that was used to generate these results",
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
     "ErrorModel": {
       "type": "object",
       "required": [
@@ -120,46 +160,6 @@ func init() {
       "example": {
         "code": 42,
         "message": "Something went wrong"
-      }
-    },
-    "ResponseModel": {
-      "type": "object",
-      "properties": {
-        "nextseed": {
-          "description": "Use this to get the next users from the deterministic series",
-          "type": "integer",
-          "format": "int64"
-        },
-        "seed": {
-          "description": "Number that was used to generate these users",
-          "type": "integer",
-          "format": "int64"
-        },
-        "users": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/User"
-          }
-        }
-      },
-      "example": {
-        "nextseed": 6,
-        "seed": 0,
-        "users": [
-          {
-            "age": 33,
-            "company": "De-engineered niches Group",
-            "country": "Romania",
-            "email": "john@mambo.dot",
-            "friends": [
-              "3d813194-e9ed-4b09-a1ae-301b83bfdd9d",
-              "356b1896-ee58-4fd8-931d-4cfaee21158e"
-            ],
-            "id": "356b1896-ee58-4fd8-931d-4cfaee21158e",
-            "name": "John Doe",
-            "position": "Central Branding Producer"
-          }
-        ]
       }
     },
     "User": {
@@ -229,6 +229,65 @@ func init() {
         "name": "John Doe",
         "position": "Central Branding Producer"
       }
+    },
+    "UserResponseModel": {
+      "type": "object",
+      "properties": {
+        "nextseed": {
+          "description": "Use this to get the next users from the deterministic series",
+          "type": "integer",
+          "format": "int64"
+        },
+        "seed": {
+          "description": "Number that was used to generate these users",
+          "type": "integer",
+          "format": "int64"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/User"
+          }
+        }
+      },
+      "example": {
+        "nextseed": 6,
+        "seed": 0,
+        "users": [
+          {
+            "age": 33,
+            "company": "De-engineered niches Group",
+            "country": "Romania",
+            "email": "john@mambo.dot",
+            "friends": [
+              "3d813194-e9ed-4b09-a1ae-301b83bfdd9d",
+              "356b1896-ee58-4fd8-931d-4cfaee21158e"
+            ],
+            "id": "356b1896-ee58-4fd8-931d-4cfaee21158e",
+            "name": "John Doe",
+            "position": "Central Branding Producer"
+          }
+        ]
+      }
+    }
+  },
+  "parameters": {
+    "count": {
+      "maximum": 500,
+      "minimum": 1,
+      "type": "integer",
+      "format": "int32",
+      "description": "How many results to generate.",
+      "name": "count",
+      "in": "path",
+      "required": true
+    },
+    "seed": {
+      "type": "integer",
+      "format": "int64",
+      "description": "The seed for the pseudo-random generator. For each unique value the same results will be given. If no seed is provided a pseudo-random one will be generated (rand.Int63).",
+      "name": "seed",
+      "in": "query"
     }
   },
   "securityDefinitions": {
@@ -237,7 +296,12 @@ func init() {
       "name": "token",
       "in": "query"
     }
-  }
+  },
+  "security": [
+    {
+      "apikey": []
+    }
+  ]
 }`))
 	FlatSwaggerJSON = json.RawMessage([]byte(`{
   "consumes": [
@@ -264,6 +328,58 @@ func init() {
   "host": "localhost",
   "basePath": "/",
   "paths": {
+    "/custom/{count}": {
+      "get": {
+        "security": [
+          {
+            "apikey": []
+          }
+        ],
+        "description": "Generate results based on a pattern/template.",
+        "parameters": [
+          {
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32",
+            "description": "How many results to generate.",
+            "name": "count",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "description": "The seed for the pseudo-random generator. For each unique value the same results will be given. If no seed is provided a pseudo-random one will be generated (rand.Int63).",
+            "name": "seed",
+            "in": "query"
+          },
+          {
+            "maxLength": 1024,
+            "minLength": 1,
+            "type": "string",
+            "description": "The template used to generate the results, eg: 'My name is ~name~'",
+            "name": "template",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The results were successfully generated",
+            "schema": {
+              "$ref": "#/definitions/CustomResponseModel"
+            }
+          },
+          "default": {
+            "description": "Error occurred",
+            "schema": {
+              "$ref": "#/definitions/ErrorModel"
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "description": "Get the health of the service",
@@ -279,11 +395,6 @@ func init() {
     },
     "/users/{count}": {
       "get": {
-        "security": [
-          {
-            "apikey": []
-          }
-        ],
         "description": "Get a random user",
         "parameters": [
           {
@@ -291,8 +402,7 @@ func init() {
             "minimum": 1,
             "type": "integer",
             "format": "int32",
-            "x-exportParamName": "Count",
-            "description": "How many users to return",
+            "description": "How many results to generate.",
             "name": "count",
             "in": "path",
             "required": true
@@ -300,8 +410,7 @@ func init() {
           {
             "type": "integer",
             "format": "int64",
-            "x-exportParamName": "Seed",
-            "description": "Seed that will be used to generate the users (deterministic call). The seed will determine the first User data, seed+1 the next user, and so on. If no seed is provided a pseudo-random one will be generated (rand.Int63).",
+            "description": "The seed for the pseudo-random generator. For each unique value the same results will be given. If no seed is provided a pseudo-random one will be generated (rand.Int63).",
             "name": "seed",
             "in": "query"
           }
@@ -310,7 +419,7 @@ func init() {
           "200": {
             "description": "The users were successfully generated",
             "schema": {
-              "$ref": "#/definitions/ResponseModel"
+              "$ref": "#/definitions/UserResponseModel"
             }
           },
           "default": {
@@ -324,6 +433,23 @@ func init() {
     }
   },
   "definitions": {
+    "CustomResponseModel": {
+      "type": "object",
+      "properties": {
+        "results": {
+          "type": "array",
+          "items": {
+            "description": "One result is one template with random data",
+            "type": "string"
+          }
+        },
+        "seed": {
+          "description": "Number that was used to generate these results",
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
     "ErrorModel": {
       "type": "object",
       "required": [
@@ -342,46 +468,6 @@ func init() {
       "example": {
         "code": 42,
         "message": "Something went wrong"
-      }
-    },
-    "ResponseModel": {
-      "type": "object",
-      "properties": {
-        "nextseed": {
-          "description": "Use this to get the next users from the deterministic series",
-          "type": "integer",
-          "format": "int64"
-        },
-        "seed": {
-          "description": "Number that was used to generate these users",
-          "type": "integer",
-          "format": "int64"
-        },
-        "users": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/User"
-          }
-        }
-      },
-      "example": {
-        "nextseed": 6,
-        "seed": 0,
-        "users": [
-          {
-            "age": 33,
-            "company": "De-engineered niches Group",
-            "country": "Romania",
-            "email": "john@mambo.dot",
-            "friends": [
-              "3d813194-e9ed-4b09-a1ae-301b83bfdd9d",
-              "356b1896-ee58-4fd8-931d-4cfaee21158e"
-            ],
-            "id": "356b1896-ee58-4fd8-931d-4cfaee21158e",
-            "name": "John Doe",
-            "position": "Central Branding Producer"
-          }
-        ]
       }
     },
     "User": {
@@ -451,6 +537,65 @@ func init() {
         "name": "John Doe",
         "position": "Central Branding Producer"
       }
+    },
+    "UserResponseModel": {
+      "type": "object",
+      "properties": {
+        "nextseed": {
+          "description": "Use this to get the next users from the deterministic series",
+          "type": "integer",
+          "format": "int64"
+        },
+        "seed": {
+          "description": "Number that was used to generate these users",
+          "type": "integer",
+          "format": "int64"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/User"
+          }
+        }
+      },
+      "example": {
+        "nextseed": 6,
+        "seed": 0,
+        "users": [
+          {
+            "age": 33,
+            "company": "De-engineered niches Group",
+            "country": "Romania",
+            "email": "john@mambo.dot",
+            "friends": [
+              "3d813194-e9ed-4b09-a1ae-301b83bfdd9d",
+              "356b1896-ee58-4fd8-931d-4cfaee21158e"
+            ],
+            "id": "356b1896-ee58-4fd8-931d-4cfaee21158e",
+            "name": "John Doe",
+            "position": "Central Branding Producer"
+          }
+        ]
+      }
+    }
+  },
+  "parameters": {
+    "count": {
+      "maximum": 500,
+      "minimum": 1,
+      "type": "integer",
+      "format": "int32",
+      "description": "How many results to generate.",
+      "name": "count",
+      "in": "path",
+      "required": true
+    },
+    "seed": {
+      "type": "integer",
+      "format": "int64",
+      "description": "The seed for the pseudo-random generator. For each unique value the same results will be given. If no seed is provided a pseudo-random one will be generated (rand.Int63).",
+      "name": "seed",
+      "in": "query"
     }
   },
   "securityDefinitions": {
@@ -459,6 +604,11 @@ func init() {
       "name": "token",
       "in": "query"
     }
-  }
+  },
+  "security": [
+    {
+      "apikey": []
+    }
+  ]
 }`))
 }

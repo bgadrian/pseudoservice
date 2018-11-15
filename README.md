@@ -8,7 +8,7 @@ The need to generate random (user or other type) data, to (stress) test your own
 #### The solution
 I've built this project to be used as an internal service, to generate large amounts of fake data.
 
-It was originally built for this project: [davidescus/10minFor300Gb](https://github.com/davidescus/10minFor300Gb) as a wrapper on [brianvoe/gofakeit](https://github.com/brianvoe/gofakeit).
+It was originally built for this project: [davidescus/10minFor300Gb](https://github.com/davidescus/10minFor300Gb) as a wrapper on [bgadrian/fastfaker](https://github.com/bgadrian/gofakeit).
 
 ### Performance 
  
@@ -24,16 +24,57 @@ For the best performance:
 
 You run it as a simple HTTP server, in a private network, and clients can make requests to get random data. 
 
- All the endpoints have 2 modes:
-* deterministic - for each `?seed=42` received as input, the same data will be generated.
-* random - if a `seed` is not given, random data will be generated. This is the most optimal method (performance).
+Global optional parameters:
+* `?seed=42` - if given, the result will be deterministic, as in for all calls the same data will be returned.
+* `token=SECRET42` - the APIKEY
+* `{count}` - how many results should be generated, integer [1,500]
 
 ### Endpoints (data types)
 
-###### /users/{count}
-`count` = how many users should generate, an integer between 1 and 500.
+##### /docs 
+Contains the OpenID/swagger documentation for this API.
 
+##### /health
+Returns `200` if the service is available.
 
+##### /custom/{count}?template="Hello &#126;name&#126;!"
+Generate random data based on a given template. Supports any string, including JSON schema.
+
+The template can contains variables like `~name~` or `~email~`. 
+
+```bash
+#the template is URL encoded: Hello ~name~!
+curl -X GET "http://localhost:8080/custom/3?token=SECRET42&seed=42&template=Hello%20~name~%21"
+{"results":[
+    "Hello Jeromy Schmeler!",
+    "Hello Kim Steuber!",
+    "Hello Jacky Borer!"
+],"seed":42}
+
+#template: {name:"~name~",age:~digit~~digit~}
+curl -X GET "http://localhost:8080/custom/3?token=SECRET42&seed=42&template=%22%7Bname%3A%22~name~%22%2Cage%3A~digit~%7D%22"
+{"results":[
+    "\"{name:\"Jeromy Schmeler\",age:53}\"",
+    "\"{name:\"Dustin Jones\",age:62}\"",
+    "\"{name:\"Keely Hartmann\",age:12}\""
+],"seed":42}
+
+#template: ~country~
+curl -X GET "http://localhost:8080/custom/6?token=SECRET42&seed=42&template=~country~"
+{"results":[
+    "Tajikistan",
+    "Cameroon",
+    "Cote Divoire",
+    "Turkmenistan",
+    "Ethiopia",
+    "Afghanistan"
+],"seed":42}
+
+``` 
+For all supported template variables see [CUSTOM.md](./CUSTOM.md)
+
+##### /users/{count}
+Generate random users based on a preconfigured set of properties.
 ```bash
 #fast and random user
 curl "http://localhost:8080/api/v1/users/1?token=SECRET42"
@@ -93,24 +134,11 @@ The binary has the following env variables:
 * `APIKEY` - secret string to be served at `?token=SECRET42` 
 * for more see `pseudoservice --help`
 
-All the endpoint have the following query params:
-* `token` - required, the APIKEY
-* `seed` - optional, for deterministic responses
-
-
-The server accepts `gzip`.
-
-The server was generated using swagger (open API), to see a full documentation of the service access the [127.0.0.1:8080/docs](http://127.0.0.1:8080/docs) endpoint.
+The server accepts `gzip` and it was generated using swagger (open API), to see a full documentation of the service access the [127.0.0.1:8080/docs](http://127.0.0.1:8080/docs) endpoint.
 
 ### TODO
-* make the docker multi-stage build work (lower the container from 700mb to 7mb)
-* add a general/custom endpoint, where the payload is an object with the types of data it requires to be generated (each client decide what objects to be generated)
+All the [issues](https://github.com/bgadrian/pseudoservice/issues)
 
 ### Copyright
-Bledea Georgescu Adrian 
-
-Free to use but not for commercial purposes.
-
-
- 
+Bledea Georgescu Adrian https://coder.today
 

@@ -25,7 +25,7 @@ type GetUsersCountOK struct {
 	/*
 	  In: Body
 	*/
-	Payload *models.ResponseModel `json:"body,omitempty"`
+	Payload *models.UserResponseModel `json:"body,omitempty"`
 }
 
 // NewGetUsersCountOK creates GetUsersCountOK with default headers values
@@ -35,13 +35,13 @@ func NewGetUsersCountOK() *GetUsersCountOK {
 }
 
 // WithPayload adds the payload to the get users count o k response
-func (o *GetUsersCountOK) WithPayload(payload *models.ResponseModel) *GetUsersCountOK {
+func (o *GetUsersCountOK) WithPayload(payload *models.UserResponseModel) *GetUsersCountOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the get users count o k response
-func (o *GetUsersCountOK) SetPayload(payload *models.ResponseModel) {
+func (o *GetUsersCountOK) SetPayload(payload *models.UserResponseModel) {
 	o.Payload = payload
 }
 

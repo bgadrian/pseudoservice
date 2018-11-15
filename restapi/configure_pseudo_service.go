@@ -44,6 +44,7 @@ func configureAPI(api *operations.PseudoServiceAPI) http.Handler {
 
 	api.GetHealthHandler = operations.GetHealthHandlerFunc(h.GetHealthHandler)
 	api.GetUsersCountHandler = operations.GetUsersCountHandlerFunc(h.GetUsersHandler)
+	api.GetCustomCountHandler = operations.GetCustomCountHandlerFunc(h.GetCustomCountParams)
 
 	api.ServerShutdown = func() {}
 

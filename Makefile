@@ -6,12 +6,16 @@ pre:
 	env GO111MODULE=on go get -d ./
 	env GO111MODULE=on go test -race ./...
 
+generate:
+	go run cmd/custom-key-generator/main.go go > handlers/custom_keys.go
+	go run cmd/custom-key-generator/main.go mark > CUSTOM.md
+
 run: pre
 	env PORT=8080 go run $(source)
 
 build: pre
 	rm -f ./build/pseudoservice
-	env GO111MODULE=on go build -o ./build/pseudoservice $(source)
+	env GO111MODULE=on CGO_ENABLED=0 go build -o ./build/pseudoservice $(source)
 	@echo "See ./build/pseudoservice --help"
 
 buildall: pre

@@ -37,7 +37,10 @@ func NewPseudoServiceAPI(spec *loads.Document) *PseudoServiceAPI {
 		BearerAuthenticator: security.BearerAuth,
 		JSONConsumer:        runtime.JSONConsumer(),
 		JSONProducer:        runtime.JSONProducer(),
-		GetHealthHandler: GetHealthHandlerFunc(func(params GetHealthParams) middleware.Responder {
+		GetCustomCountHandler: GetCustomCountHandlerFunc(func(params GetCustomCountParams, principal interface{}) middleware.Responder {
+			return middleware.NotImplemented("operation GetCustomCount has not yet been implemented")
+		}),
+		GetHealthHandler: GetHealthHandlerFunc(func(params GetHealthParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation GetHealth has not yet been implemented")
 		}),
 		GetUsersCountHandler: GetUsersCountHandlerFunc(func(params GetUsersCountParams, principal interface{}) middleware.Responder {
@@ -89,6 +92,8 @@ type PseudoServiceAPI struct {
 	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
 	APIAuthorizer runtime.Authorizer
 
+	// GetCustomCountHandler sets the operation handler for the get custom count operation
+	GetCustomCountHandler GetCustomCountHandler
 	// GetHealthHandler sets the operation handler for the get health operation
 	GetHealthHandler GetHealthHandler
 	// GetUsersCountHandler sets the operation handler for the get users count operation
@@ -158,6 +163,10 @@ func (o *PseudoServiceAPI) Validate() error {
 
 	if o.ApikeyAuth == nil {
 		unregistered = append(unregistered, "TokenAuth")
+	}
+
+	if o.GetCustomCountHandler == nil {
+		unregistered = append(unregistered, "GetCustomCountHandler")
 	}
 
 	if o.GetHealthHandler == nil {
@@ -275,6 +284,11 @@ func (o *PseudoServiceAPI) initHandlerCache() {
 	if o.handlers == nil {
 		o.handlers = make(map[string]map[string]http.Handler)
 	}
+
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/custom/{count}"] = NewGetCustomCount(o.context, o.GetCustomCountHandler)
 
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)

@@ -1,7 +1,8 @@
 module github.com/bgadrian/pseudoservice
 
 require (
-	github.com/brianvoe/gofakeit v3.15.0+incompatible
+	github.com/bgadrian/fastfaker v0.0.0-20181115195422-fe25bb80cc52
+	github.com/engoengine/math v1.0.1 // indirect
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8 // indirect
 	github.com/go-openapi/analysis v0.17.2 // indirect
 	github.com/go-openapi/errors v0.17.2
@@ -16,7 +17,6 @@ require (
 	github.com/google/go-cmp v0.2.0
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/kr/pretty v0.1.0 // indirect
-	github.com/kr/pty v1.1.3 // indirect
 	golang.org/x/net v0.0.0-20181102091132-c10e9556a7bc
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )

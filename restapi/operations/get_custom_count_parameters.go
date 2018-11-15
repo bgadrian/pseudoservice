@@ -17,18 +17,18 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 )
 
-// NewGetUsersCountParams creates a new GetUsersCountParams object
+// NewGetCustomCountParams creates a new GetCustomCountParams object
 // no default values defined in spec.
-func NewGetUsersCountParams() GetUsersCountParams {
+func NewGetCustomCountParams() GetCustomCountParams {
 
-	return GetUsersCountParams{}
+	return GetCustomCountParams{}
 }
 
-// GetUsersCountParams contains all the bound params for the get users count operation
+// GetCustomCountParams contains all the bound params for the get custom count operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters GetUsersCount
-type GetUsersCountParams struct {
+// swagger:parameters GetCustomCount
+type GetCustomCountParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
@@ -44,13 +44,20 @@ type GetUsersCountParams struct {
 	  In: query
 	*/
 	Seed *int64
+	/*The template used to generate the results, eg: 'My name is ~name~'
+	  Required: true
+	  Max Length: 1024
+	  Min Length: 1
+	  In: query
+	*/
+	Template string
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewGetUsersCountParams() beforehand.
-func (o *GetUsersCountParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewGetCustomCountParams() beforehand.
+func (o *GetCustomCountParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
@@ -67,6 +74,11 @@ func (o *GetUsersCountParams) BindRequest(r *http.Request, route *middleware.Mat
 		res = append(res, err)
 	}
 
+	qTemplate, qhkTemplate, _ := qs.GetOK("template")
+	if err := o.bindTemplate(qTemplate, qhkTemplate, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -74,7 +86,7 @@ func (o *GetUsersCountParams) BindRequest(r *http.Request, route *middleware.Mat
 }
 
 // bindCount binds and validates parameter Count from path.
-func (o *GetUsersCountParams) bindCount(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *GetCustomCountParams) bindCount(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -97,7 +109,7 @@ func (o *GetUsersCountParams) bindCount(rawData []string, hasKey bool, formats s
 }
 
 // validateCount carries on validations for parameter Count
-func (o *GetUsersCountParams) validateCount(formats strfmt.Registry) error {
+func (o *GetCustomCountParams) validateCount(formats strfmt.Registry) error {
 
 	if err := validate.MinimumInt("count", "path", int64(o.Count), 1, false); err != nil {
 		return err
@@ -111,7 +123,7 @@ func (o *GetUsersCountParams) validateCount(formats strfmt.Registry) error {
 }
 
 // bindSeed binds and validates parameter Seed from query.
-func (o *GetUsersCountParams) bindSeed(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *GetCustomCountParams) bindSeed(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -128,6 +140,45 @@ func (o *GetUsersCountParams) bindSeed(rawData []string, hasKey bool, formats st
 		return errors.InvalidType("seed", "query", "int64", raw)
 	}
 	o.Seed = &value
+
+	return nil
+}
+
+// bindTemplate binds and validates parameter Template from query.
+func (o *GetCustomCountParams) bindTemplate(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	if !hasKey {
+		return errors.Required("template", "query")
+	}
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: true
+	// AllowEmptyValue: false
+	if err := validate.RequiredString("template", "query", raw); err != nil {
+		return err
+	}
+
+	o.Template = raw
+
+	if err := o.validateTemplate(formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// validateTemplate carries on validations for parameter Template
+func (o *GetCustomCountParams) validateTemplate(formats strfmt.Registry) error {
+
+	if err := validate.MinLength("template", "query", o.Template, 1); err != nil {
+		return err
+	}
+
+	if err := validate.MaxLength("template", "query", o.Template, 1024); err != nil {
+		return err
+	}
 
 	return nil
 }
