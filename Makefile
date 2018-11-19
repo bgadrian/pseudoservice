@@ -10,12 +10,12 @@ run: pre
 	env PORT=8080 go run $(source)
 
 build: pre
-	rm -f ./build/pseudoservice
+	rm -rf ./build/pseudoservice
 	env GO111MODULE=on CGO_ENABLED=0 go build -o ./build/pseudoservice $(source)
 	@echo "See ./build/pseudoservice --help"
 
 buildall: pre
-	rm -f ./build/pseudoservice
+	rm -rf ./build/pseudoservice
 	mkdir -p ./build/pseudoservice/windows
 	mkdir -p ./build/pseudoservice/linux
 	mkdir -p ./build/pseudoservice/macos

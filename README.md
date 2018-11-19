@@ -10,14 +10,43 @@ The need to generate random (user or other type) data, to mockup, test or stress
 I've built this project to be used as an internal service, to generate large amounts of fake data.
 
 ### Performance 
- 
-On my localhost (4 Core 3Ghz) I was able to generate over **14.000 users/second** (`/users/`) with 100 batches, on an 600Mhz B2 AppEngine (1 Core) can deliver 900 users/second. 
-Future improvements will be done. To run your own benchmarks see [call_benchmark.sh](./call_benchmark.sh)
-
-For the best performance: 
+To run your own benchmarks see [call_benchmark.sh](./call_benchmark.sh). For the best performance I recommend the following:
 * Count (batch) value: **100**
 * concurrent requests: CPUCores * 1.5
-* it does not scale well on multiple cores, it uses the math.Rand that has a mutex, recommended 3-6 cores
+
+#### Benchmarks
+Tests done on Pseudoservice 2.0.0 using ApacheBench 2.3 `ab -n 8000 -c 6 -kdq -m GET  http://localhost:8080/users/100?token=SECRET42`. The tests ignore any network latency, does not unmarshall the response, reuses HTTP connections (keep-alive) and were made from the local machine (where pseudoservice was running), meaning you will have **at least a 20% lower performance** in a real-world scenario.
+
+* **t2.micro** (~1 CPU), AWS Linux
+```bash
+  Time taken for tests:   7.649 seconds
+  Complete requests:      8000
+  Requests per second:    1045.86 [#/sec] (mean)
+  Time per request:       5.737 [ms] (mean)
+  Time per request:       0.956 [ms] (mean, across all concurrent requests)
+  Transfer rate:          45236.55 [Kbytes/sec] received
+  Translation: 45Mb/s fake data = 104500 fake users/s
+```
+* **t2.xlarge** (~4 CPU), AWS Linux
+```bash
+    Time taken for tests:   2.825 seconds
+    Requests per second:    2832.02 [#/sec] (mean)
+    Time per request:       2.119 [ms] (mean)
+    Time per request:       0.353 [ms] (mean, across all concurrent requests)
+    Transfer rate:          122314.75 [Kbytes/sec] received
+    Translation: 122Mb/s fake data =  283200 users/s
+```
+* **c5.2xlarge**	(~8 CPU), AWS Linux
+```bash
+    Time taken for tests:   2.035 seconds
+    Total transferred:      353697150 bytes
+    HTML transferred:       352137150 bytes
+    Requests per second:    3931.71 [#/sec] (mean)
+    Time per request:       1.526 [ms] (mean)
+    Time per request:       0.254 [ms] (mean, across all concurrent requests)
+    Transfer rate:          169755.12 [Kbytes/sec] received
+    Translation: 170Mb/s fake data = 393100 users/s
+```
 
 ### How it works
 
@@ -111,6 +140,11 @@ curl "http://localhost:8080/api/v1/users/1?token=SECRET42&seed=42"
 ### How to install
 
 a). Download the [binaries from a Release](https://github.com/bgadrian/pseudoservice/releases)
+```bash
+wget https://github.com/bgadrian/pseudoservice/releases/download/v2.0.0/pseudoservice.tar.gz
+tar -xzf pseudoservice.tar.gz
+./pseudoservice/linux/pseudoservice --api-key=SECRET42 --read-timeout=1s --write-timeout=1s --keep-alive=15s --listen-limit=1024 --max-header-size=3KiB --host=0.0.0.0 --port=8080
+```
 
 OR b). Get the [docker image from bgadrian/pseudoservice/](https://hub.docker.com/r/bgadrian/pseudoservice/)
 ```bash
@@ -123,6 +157,7 @@ OR c). Hard way, requires Go 1.11, make and git
 ```bash
 git clone git@github.com:bgadrian/pseudoservice.git
 cd pseudoservice
+
 make run
 #OR
 make build
