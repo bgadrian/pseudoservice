@@ -8,7 +8,7 @@ RUN go mod download
 COPY . .
 RUN make build
 
-FROM scratch
+FROM alpine
 COPY --from=builder /src/build/pseudoservice .
 ENV PORT=8080
 EXPOSE 8080

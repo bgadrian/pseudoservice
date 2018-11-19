@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/bgadrian/fastfaker"
+	"github.com/bgadrian/fastfaker/faker"
 	"github.com/bgadrian/pseudoservice/restapi/operations"
 	"github.com/go-openapi/runtime/middleware"
 )
@@ -15,7 +15,7 @@ func (*MyHandlers) GetHealthHandler(params operations.GetHealthParams, principal
 	timeout := time.NewTicker(time.Millisecond * 200)
 	var done chan bool
 	go func() {
-		fastfaker.Global.Int64()
+		faker.Global.Int64()
 		done <- true
 	}()
 	select {

@@ -47,7 +47,7 @@ func TestGenerateCustomJson(t *testing.T) {
 		{`{name:"~name~"}`, `{name:"Jeromy Schmeler"}`},
 		{`["~name~", "~name~"]`, `["Jeromy Schmeler", "Kim Steuber"]`},
 
-		{`{name:"~name~", age: ~digit~}`, `{name:"Jeromy Schmeler", age: 5}`},
+		{`{name:"~name~", age: ~digit~}`, `{name:"Jeromy Schmeler", age: 8}`},
 	} {
 		got := GenerateCustom(42, test.template, 1)
 
@@ -87,5 +87,5 @@ func ExampleGenerateCustomJson() {
 	for _, result := range randomData {
 		fmt.Printf("%s\n", result)
 	}
-	// Output:{name:"Jeromy Schmeler", age: 5}
+	// Output:{name:"Jeromy Schmeler", age: 8}
 }

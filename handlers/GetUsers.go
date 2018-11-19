@@ -11,7 +11,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/bgadrian/fastfaker"
+	"github.com/bgadrian/fastfaker/faker"
 )
 
 // GetUsersHandler /users/{count} handler with real data
@@ -27,7 +27,7 @@ func (h *MyHandlers) GetUsersHandler(params operations.GetUsersCountParams, prin
 	if seedGiven {
 		seed = *params.Seed
 	} else {
-		seed = fastfaker.Global.Int64()
+		seed = faker.Global.Int64()
 	}
 
 	users, nextseed, err := GenerateUsers(seed, int(params.Count), seedGiven)
@@ -58,7 +58,7 @@ func GenerateUsers(seed int64, count int, deterministic bool) ([]*models.User, i
 		//chance to being here is like ... 2^63-count ...is like winning the lottery
 		return nil, 0, fmt.Errorf("int overflow, need a smaller seed: %d count: %d", seed, count)
 	}
-	faker := fastfaker.NewFastFaker()
+	faker := faker.NewFastFaker()
 
 	if deterministic == false {
 		faker.Seed(seed)

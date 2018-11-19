@@ -1,14 +1,13 @@
 # Pseudo service ![travis-mater](https://travis-ci.com/bgadrian/pseudoservice.svg?branch=master) [![Go Report Card](https://goreportcard.com/badge/github.com/bgadrian/pseudoservice)](https://goreportcard.com/report/github.com/bgadrian/pseudoservice)
 
 Pseudo random (deterministic) data generator as a (micro) service.
+It is a wrapper for the [FastFaker Go package](https://github.com/bgadrian/fastfaker).
 
 #### The problem
-The need to generate random (user or other type) data, to (stress) test your own system. 
+The need to generate random (user or other type) data, to mockup, test or stress  your own systems. 
 
 #### The solution
 I've built this project to be used as an internal service, to generate large amounts of fake data.
-
-It was originally built for this project: [davidescus/10minFor300Gb](https://github.com/davidescus/10minFor300Gb) as a wrapper on [bgadrian/fastfaker](https://github.com/bgadrian/gofakeit).
 
 ### Performance 
  
@@ -22,7 +21,7 @@ For the best performance:
 
 ### How it works
 
-You run it as a simple HTTP server, in a private network, and clients can make requests to get random data. 
+You run it as a simple HTTP server, in a private network, and the clients can make requests to get random data, based on their custom templates/needs.
 
 Global optional parameters:
 * `?seed=42` - if given, the result will be deterministic, as in for all calls the same data will be returned.
@@ -40,7 +39,7 @@ Returns `200` if the service is available.
 ##### /custom/{count}?template="Hello &#126;name&#126;!"
 Generate random data based on a given template. Supports any string, including JSON schema.
 
-The template can contains variables like `~name~` or `~email~`. 
+The template can contains variables like `~name~` or `~email~`. For a full list see the [FastFaker variables](https://github.com/bgadrian/fastfaker/blob/master/TEMPLATE_VARIABLES.md), but instead of `{}` you must use the `~` delimiter (it is more URL friendly).
 
 ```bash
 #the template is URL encoded: Hello ~name~!
@@ -69,12 +68,15 @@ curl -X GET "http://localhost:8080/custom/6?token=SECRET42&seed=42&template=~cou
     "Ethiopia",
     "Afghanistan"
 ],"seed":42}
-
 ``` 
-For all supported template variables see [CUSTOM.md](./CUSTOM.md)
+
+For more examples see the FastFaker [examples](https://github.com/bgadrian/fastfaker/tree/master/example) and [GoDoc](https://godoc.org/github.com/bgadrian/fastfaker/faker#pkg-examples).
 
 ##### /users/{count}
-Generate random users based on a preconfigured set of properties.
+Generate random users based on a preconfigured set of properties, with a friend relationship between them.
+
+This endpoint was created to simulate a Social network and test a Graph database: [davidescus/10minFor300Gb](https://github.com/davidescus/10minFor300Gb).
+
 ```bash
 #fast and random user
 curl "http://localhost:8080/api/v1/users/1?token=SECRET42"
@@ -90,7 +92,7 @@ curl "http://localhost:8080/api/v1/users/1?token=SECRET42"
     }
 ]}
 
-#slow and deterministic call (seed=42)
+#slower but deterministic call (seed=42)
 curl "http://localhost:8080/api/v1/users/1?token=SECRET42&seed=42"
 
 {"seed":42,"nextseed":43,"users":[
