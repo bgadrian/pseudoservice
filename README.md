@@ -1,4 +1,4 @@
-# Pseudo service ![travis-mater](https://travis-ci.com/bgadrian/pseudoservice.svg?branch=master) [![Go Report Card](https://goreportcard.com/badge/github.com/bgadrian/pseudoservice)](https://goreportcard.com/report/github.com/bgadrian/pseudoservice)
+# Pseudo service ![travis-mater](https://travis-ci.com/bgadrian/pseudoservice.svg?branch=master) [![Go Report Card](https://goreportcard.com/badge/github.com/bgadrian/pseudoservice)](https://goreportcard.com/report/github.com/bgadrian/pseudoservice)  [![contributions](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/bgadrian/pseudoservice/issues)
 
 Pseudo random (deterministic) data generator as a (micro) service.
 It is a wrapper for the [FastFaker Go package](https://github.com/bgadrian/fastfaker).

@@ -1,7 +1,7 @@
 module github.com/bgadrian/pseudoservice
 
 require (
-	github.com/bgadrian/fastfaker v2.0.0+incompatible
+	github.com/bgadrian/fastfaker v2.0.2+incompatible
 	github.com/engoengine/math v1.0.1 // indirect
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8 // indirect
 	github.com/go-openapi/analysis v0.17.2 // indirect

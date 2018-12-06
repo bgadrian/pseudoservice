@@ -6,6 +6,8 @@ github.com/asaskevich/govalidator v0.0.0-20180720115003-f9ffefc3facf h1:eg0MeVzs
 github.com/asaskevich/govalidator v0.0.0-20180720115003-f9ffefc3facf/go.mod h1:lB+ZfQJz7igIIfQNfa7Ml4HSf2uFQQRzpGGRXenZAgY=
 github.com/bgadrian/fastfaker v2.0.0+incompatible h1:aW4jyBhYEq2dKCZvROm1QNfcgnl3CRxXOjQlqnTfa6E=
 github.com/bgadrian/fastfaker v2.0.0+incompatible/go.mod h1:aQSXCiKk6GFZoS6DBRP8w2L81E6kIm2JgjpfhMkl64M=
+github.com/bgadrian/fastfaker v2.0.2+incompatible h1:wJMF4VcSWelRvC9XUVKxd1QpEWVRIyzSRWuSBYx6CNs=
+github.com/bgadrian/fastfaker v2.0.2+incompatible/go.mod h1:aQSXCiKk6GFZoS6DBRP8w2L81E6kIm2JgjpfhMkl64M=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/docker/go-units v0.3.3 h1:Xk8S3Xj5sLGlG5g67hJmYMmUgXv5N4PhkjJHHqrwnTk=
